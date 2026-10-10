@@ -1,0 +1,95 @@
+{
+  "scope": "Isolated static design preview only; no Supabase or emails",
+  "browser": "Headless local Chromium",
+  "results": [
+    {
+      "role": "patient",
+      "theme": "light",
+      "width": 1440,
+      "geometry": {
+        "width": 1440,
+        "contentWidth": 1440,
+        "shortButtons": [],
+        "clippedButtons": []
+      }
+    },
+    {
+      "role": "patient",
+      "theme": "light",
+      "width": 390,
+      "geometry": {
+        "width": 390,
+        "contentWidth": 390,
+        "shortButtons": [],
+        "clippedButtons": []
+      }
+    },
+    {
+      "role": "patient",
+      "theme": "dark",
+      "width": 1440,
+      "geometry": {
+        "width": 1440,
+        "contentWidth": 1440,
+        "shortButtons": [],
+        "clippedButtons": []
+      }
+    },
+    {
+      "role": "patient",
+      "theme": "dark",
+      "width": 390,
+      "geometry": {
+        "width": 390,
+        "contentWidth": 390,
+        "shortButtons": [],
+        "clippedButtons": []
+      }
+    },
+    {
+      "role": "staff",
+      "theme": "light",
+      "width": 1440,
+      "geometry": {
+        "width": 1440,
+        "contentWidth": 1440,
+        "shortButtons": [],
+        "clippedButtons": []
+      }
+    },
+    {
+      "role": "staff",
+      "theme": "light",
+      "width": 390,
+      "geometry": {
+        "width": 390,
+        "contentWidth": 390,
+        "shortButtons": [],
+        "clippedButtons": []
+      }
+    },
+    {
+      "role": "staff",
+      "theme": "dark",
+      "width": 1440,
+      "geometry": {
+        "width": 1440,
+        "contentWidth": 1440,
+        "shortButtons": [],
+        "clippedButtons": []
+      }
+    },
+    {
+      "role": "staff",
+      "theme": "dark",
+      "width": 390,
+      "geometry": {
+        "width": 390,
+        "contentWidth": 390,
+        "shortButtons": [],
+        "clippedButtons": []
+      }
+    }
+  ],
+  "errors": []
+}

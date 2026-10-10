@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {analyticsRange,metricNumber} from '../analytics.js';
+test('date presets use Manila date arithmetic and bound inclusive ranges',()=>{assert.deepEqual(analyticsRange('2090-01-01',7),{from:'2089-12-26',to:'2090-01-01'});assert.throws(()=>analyticsRange('invalid',7));assert.throws(()=>analyticsRange('2090-01-01',94))});
+test('missing metrics stay N/A, zero is a valid measured value',()=>{assert.equal(metricNumber(null),'N/A');assert.equal(metricNumber(undefined),'N/A');assert.equal(metricNumber(0),'0');assert.equal(metricNumber(1.26),'1.3')});

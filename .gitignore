@@ -1,0 +1,14 @@
+**/node_modules/
+**/*-debug.log
+**/.firebase/
+**/firebase-debug.log
+**/firestore-debug.log
+**/.local-tools/
+**/.local-data/
+/.playwright-cli/
+/.superpowers/
+/API KEY.txt
+/MediSched-Brevo.txt
+/New Text Document.txt
+/*.zip
+/MediSched-original/

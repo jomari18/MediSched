@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="MediSched helps you find a clinic appointment, plan your next visit and keep your appointment history in one place.">
+  <title>MediSched · Care, on your schedule</title>
+  <link rel="icon" href="hospital-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="workspace.css">
+
+  <script type="module" src="theme.js"></script>
+  <meta name="theme-color" content="#f6f7f9">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="MediSched">
+<link rel="stylesheet" href="redesign.css"></head>
+<body data-page="auth">
+<div class="landing">
+  <header class="landing-header">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">+</span>MediSched</a>
+    <nav class="landing-links" aria-label="About MediSched"><a href="#how-it-works">How it works</a><a href="#clinic-hours">Clinic hours</a></nav><div class="landing-header-actions"><button class="secondary" data-switch="login">Sign in</button><button data-switch="register">Create account</button></div>
+  </header>
+  <main class="landing-grid">
+    <section class="landing-intro" aria-labelledby="landingTitle">
+      <div class="hero-copy"><p class="landing-kicker">YOUR NEXT VISIT, SIMPLIFIED</p>
+      <h1 class="landing-title" id="landingTitle">Care that fits<br><span>your day.</span></h1>
+      <p class="landing-description">Find your time. Plan your visit. Keep everything in one place.</p>
+      <div class="hero-actions"><button data-switch="register">Create your account <span aria-hidden="true">→</span></button><button class="text-button" data-switch="login">Sign in →</button></div></div>
+      <img class="hero-art" src="assets/medical-pack/illustrations/hero-medical-calendar.png" alt="Medical calendar and red stethoscope" width="1536" height="1024" fetchpriority="high">
+    </section>
+    <section class="landing-facts" id="clinic-hours" aria-label="Clinic hours"><p><span class="fact-icon" aria-hidden="true">◷</span><span><strong>8 AM–5 PM</strong>Every day · Lunch 12 PM–1 PM</span></p><p><span class="fact-icon" aria-hidden="true">▦</span><span><strong>One-hour visits</strong>Focused on you</span></p><p><span class="fact-icon" aria-hidden="true">◉</span><span><strong>Philippine time</strong>All schedules are in PHT</span></p></section>
+    <section class="how-it-works" id="how-it-works" aria-label="How it works"><article><span>01</span><img class="feature-art" src="assets/medical-pack/features/create-account.svg" alt="" width="76" height="76"><div><h2>Create your account</h2><p>Sign up and verify your email to get started.</p></div></article><article><span>02</span><img class="feature-art" src="assets/medical-pack/features/choose-visit.svg" alt="" width="76" height="76"><div><h2>Choose your visit</h2><p>Browse available dates and times that work for you.</p></div></article><article><span>03</span><img class="feature-art" src="assets/medical-pack/features/appointment-history.svg" alt="" width="76" height="76"><div><h2>Keep it organized</h2><p>View and manage your appointments in one place.</p></div></article></section>
+    <section class="auth-shell landing-auth" id="account" aria-label="Patient account">
+<div class="panel"><div class="auth-illustration"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">+</span>MediSched</a><img src="assets/medical-pack/illustrations/booking-auth-medical-still-life.png" alt="" width="240" height="240" decoding="async"></div><p class="eyebrow">PATIENT PORTAL</p><p id="authStatus" role="status" aria-live="polite">Connecting…</p><section id="loginPanel"><h2>Welcome back</h2><p class="auth-subtitle">Sign in to manage your next visit.</p><form id="loginForm"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" required><label for="loginPassword">Password</label><div class="password"><input id="loginPassword" type="password" autocomplete="current-password" required><button type="button" data-password="loginPassword" aria-controls="loginPassword" aria-pressed="false" class="secondary">Show</button></div><button type="submit">Sign in</button></form><button class="text-button" data-switch="register">Create an account</button></section><section id="registerPanel" hidden><h2>Your care starts here</h2><p>Create your patient account.</p><form id="registerForm"><label for="registerName">Full name</label><input id="registerName" autocomplete="name" maxlength="120" required><label for="registerEmail">Email</label><input id="registerEmail" type="email" autocomplete="email" required><label for="registerPassword">Password (at least 8 characters)</label><div class="password"><input id="registerPassword" type="password" autocomplete="new-password" minlength="8" required><button type="button" data-password="registerPassword" aria-controls="registerPassword" aria-pressed="false" class="secondary">Show</button></div><label for="confirmPassword">Confirm password</label><div class="password"><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required><button type="button" data-password="confirmPassword" aria-controls="confirmPassword" aria-pressed="false" class="secondary">Show</button></div><button type="submit">Create account</button></form><button class="text-button" data-switch="login">Back to sign in</button></section><section id="verifyPanel" hidden><img class="verification-art" src="assets/medical-pack/illustrations/email-verification-envelope.png" alt="" width="120" height="120"><h2>Verify your email</h2><p>Enter the email code sent to <span id="verificationEmail"></span>. Already registered? You can return to sign in.</p><form id="verifyForm" autocomplete="off"><label id="verificationCodeLabel" for="verificationCode">Email code</label><input id="verificationCode" name="verification-code" type="text" inputmode="numeric" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" required><button type="submit">Verify email</button></form><button id="resendCode" class="secondary">Resend code</button><button class="text-button" data-switch="login">Back to sign in</button></section><button id="resendVerification" class="secondary">Resend verification using sign-in details</button></div>
+      <p class="auth-footnote">Your appointments, details and history—available whenever you sign in.</p>
+    </section>
+  </main>
+  <footer class="landing-footer"><p>Developed solely by Jomari M. Candido · Academic portfolio project</p><p>Philippine time · Lunch break 12 PM–1 PM · <a href="artwork-credit.html">Artwork credit</a></p></footer>
+</div>
+<script type="module" src="script.js"></script>
+
+<script type="module" src="presentation.js"></script></body>
+</html>

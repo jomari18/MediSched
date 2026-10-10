@@ -1,0 +1,70 @@
+{
+  "brand": "MediSched",
+  "type": "design-assets-only",
+  "pngs": [
+    {
+      "file": "illustrations/hero-medical-calendar.png"
+    },
+    {
+      "file": "illustrations/dashboard-calendar-stethoscope.png"
+    },
+    {
+      "file": "illustrations/booking-auth-medical-still-life.png"
+    },
+    {
+      "file": "illustrations/mobile-calendar.png"
+    },
+    {
+      "file": "illustrations/email-verification-envelope.png"
+    },
+    {
+      "file": "illustrations/red-stethoscope.png"
+    },
+    {
+      "file": "illustrations/medical-plus-cube.png"
+    },
+    {
+      "file": "illustrations/blush-plant.png"
+    }
+  ],
+  "svgs": [
+    "icons/home.svg",
+    "icons/calendar.svg",
+    "icons/calendar-plus.svg",
+    "icons/clock.svg",
+    "icons/map-pin.svg",
+    "icons/user.svg",
+    "icons/more.svg",
+    "icons/arrow-right.svg",
+    "icons/arrow-left.svg",
+    "icons/chevron-right.svg",
+    "icons/chevron-left.svg",
+    "icons/chevron-down.svg",
+    "icons/plus.svg",
+    "icons/sign-out.svg",
+    "icons/eye.svg",
+    "icons/mail.svg",
+    "icons/check.svg",
+    "icons/check-circle.svg",
+    "icons/clipboard.svg",
+    "icons/history.svg",
+    "icons/tooth.svg",
+    "icons/stethoscope.svg",
+    "icons/hospital.svg",
+    "icons/utensils.svg",
+    "icons/refresh.svg",
+    "icons/info.svg",
+    "icons/close.svg",
+    "icons/sun.svg",
+    "icons/moon.svg",
+    "icons/qr-code.svg",
+    "icons/menu.svg",
+    "brand/medisched-mark.svg",
+    "brand/medisched-wordmark.svg",
+    "backgrounds/blush-halo.svg",
+    "backgrounds/blush-ellipse.svg",
+    "features/create-account.svg",
+    "features/choose-visit.svg",
+    "features/appointment-history.svg"
+  ]
+}
