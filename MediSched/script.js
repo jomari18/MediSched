@@ -8,6 +8,7 @@ import {validateAppointment,appointmentStatus,manilaDateTime,bookingParameters} 
 import {availableOptions} from './availability.js';
 import {AUTH_STORAGE_KEY,isConfirmed,validatePublicConfig,callbackInfo,friendlyError} from './auth-helpers.js';
 import {otpConfig,otpToken,readVerification,saveVerification,cooldownRemaining,clearVerificationContext,OTP_STORAGE_KEY} from './otp.js';
+import {mountPasswordRecovery} from './password-recovery-ui.js';
 const $=id=>document.getElementById(id),dashboard=document.body.dataset.page==='dashboard';
 const status=text=>{$(dashboard?'dashboardStatus':'authStatus').textContent=text;if(!dashboard&&text&&text!=='Ready to sign in.')document.body.classList.add('account-view');};
 let client=null,currentUser=null,ready=false,authOperation=false,authEpoch=0;
@@ -44,9 +45,9 @@ function showPanel(panel,{preserveStatus=false}={}){
   resetPasswords();
   document.querySelectorAll('input[type=password]').forEach(input=>input.value='');
   $('verificationCode').value='';
-  for(const id of ['login','register','verify'])$(id+'Panel').hidden=id!==panel;
+  for(const id of ['login','register','verify','recovery'])$(id+'Panel').hidden=id!==panel;
   $('resendVerification').hidden=panel!=='login';
-  $(panel==='verify'?'verificationCode':panel==='login'?'loginEmail':'registerName').focus();
+  $(panel==='verify'?'verificationCode':panel==='login'?'loginEmail':panel==='recovery'?'recoveryEmail':'registerName').focus();
   updateResend();
 }
 function showVerification(email){
@@ -63,7 +64,8 @@ async function signOut(scope='global'){
   clearProtectedView();clearAppStorage();
 }
 if(!dashboard){
-  document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>{if(!authOperation)showPanel(b.dataset.switch);}));
+  const recoveryUI=mountPasswordRecovery({status,showPanel,isReady:()=>ready,isNormalBusy:()=>authOperation,getNormalClient:needClient,clearNormalSession:signOut});
+  document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>{if(!authOperation&&!recoveryUI.isBusy())showPanel(b.dataset.switch);}));
   $('verificationCode').maxLength=otpSettings.otpLength;$('verificationCode').minLength=otpSettings.otpLength;$('verificationCode').pattern=`[0-9]{${otpSettings.otpLength}}`;$('verificationCodeLabel').textContent=`${otpSettings.otpLength}-digit email code`;
   setInterval(updateResend,1000);updateResend();
   document.querySelectorAll('[data-password]').forEach(b=>b.addEventListener('click',()=>{const input=$(b.dataset.password),show=input.type==='password';input.type=show?'text':'password';b.textContent=show?'Hide':'Show';b.setAttribute('aria-pressed',String(show));}));
