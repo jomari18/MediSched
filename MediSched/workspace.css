@@ -15,3 +15,5 @@ body{background:var(--bg);line-height:1.55;font-size:15px;min-height:100vh;min-h
 @media(max-width:767px){.analytics-filters{grid-template-columns:1fr 1fr;padding:18px;gap:14px}.analytics-grid{grid-template-columns:1fr}.analytics-output .metrics{gap:12px}.analytics-output .metric{padding:16px}.analytics-output .metric strong{font-size:24px}.analytics-table{padding:18px}.analytics-table table{font-size:12px}.analytics-table th,.analytics-table td{padding:12px 8px;min-width:70px}.analytics-chart{max-height:320px}.welcome{flex-wrap:wrap}#scanCheckin,#refreshSchedule{flex:1;white-space:normal}}
 .analytics-filters>div{min-width:0}.analytics-filters input,.analytics-filters select{min-width:0;width:100%}
 @media(max-width:480px){.analytics-filters{grid-template-columns:minmax(0,1fr)}}
+/* Keep Netlify's injected "Powered by Netlify" badge above the fixed phone navigation. */
+@media(max-width:767px){body:has(.mobile-nav) #nl-badge-frame{bottom:calc(84px + env(safe-area-inset-bottom))!important}}
