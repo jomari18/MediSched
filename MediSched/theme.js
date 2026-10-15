@@ -1,4 +1,58 @@
-export function initializeTheme({document=globalThis.document,storage,media=globalThis.matchMedia?.('(prefers-color-scheme: dark)')}={}){if(storage===undefined){try{storage=globalThis.localStorage}catch{storage=null}}let explicit=null;try{const value=storage?.getItem('medisched.theme');if(['light','dark'].includes(value))explicit=value}catch{}let theme=explicit||(media?.matches?'dark':'light');const buttons=[...document.querySelectorAll('[data-theme-toggle]')];function paint(){document.documentElement.dataset.theme=theme;document.documentElement.style?.setProperty('color-scheme',theme);for(const b of buttons){b.textContent=theme==='dark'?'Light theme':'Dark theme';b.setAttribute('aria-label',`Switch to ${theme==='dark'?'light':'dark'} theme`);b.setAttribute('aria-pressed',String(theme==='dark'))}document.querySelector?.('meta[name=theme-color]')?.setAttribute('content',theme==='dark'?'#101419':'#f6f7f9')}
- function setTheme(value){if(!['light','dark'].includes(value))return;explicit=value;theme=value;try{storage?.setItem('medisched.theme',value)}catch{}paint()}
- const system=e=>{if(!explicit){theme=e.matches?'dark':'light';paint()}};media?.addEventListener?.('change',system);buttons.forEach(b=>b.addEventListener('click',()=>setTheme(theme==='dark'?'light':'dark')));paint();return {setTheme,currentTheme:()=>theme,dispose:()=>media?.removeEventListener?.('change',system)}}
-if(typeof document!=='undefined')initializeTheme();
+export function initializeTheme({
+  document = globalThis.document,
+  storage,
+  media = globalThis.matchMedia?.('(prefers-color-scheme: dark)')
+} = {}) {
+  if (storage === undefined) {
+    try {
+      storage = globalThis.localStorage;
+    } catch {
+      storage = null;
+    }
+  }
+  let explicit = null;
+  try {
+    const value = storage?.getItem('medisched.theme');
+    if (['light', 'dark'].includes(value)) explicit = value;
+  } catch {}
+  let theme = explicit || (media?.matches ? 'dark' : 'light');
+  const buttons = [...document.querySelectorAll('[data-theme-toggle]')];
+  function paint() {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style?.setProperty('color-scheme', theme);
+    for (const b of buttons) {
+      b.textContent = theme === 'dark' ? 'Light theme' : 'Dark theme';
+      b.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`);
+      b.setAttribute('aria-pressed', String(theme === 'dark'));
+    }
+    document
+      .querySelector?.('meta[name=theme-color]')
+      ?.setAttribute('content', theme === 'dark' ? '#101419' : '#f6f7f9');
+  }
+  function setTheme(value) {
+    if (!['light', 'dark'].includes(value)) return;
+    explicit = value;
+    theme = value;
+    try {
+      storage?.setItem('medisched.theme', value);
+    } catch {}
+    paint();
+  }
+  const system = e => {
+    if (!explicit) {
+      theme = e.matches ? 'dark' : 'light';
+      paint();
+    }
+  };
+  media?.addEventListener?.('change', system);
+  buttons.forEach(b =>
+    b.addEventListener('click', () => setTheme(theme === 'dark' ? 'light' : 'dark'))
+  );
+  paint();
+  return {
+    setTheme,
+    currentTheme: () => theme,
+    dispose: () => media?.removeEventListener?.('change', system)
+  };
+}
+if (typeof document !== 'undefined') initializeTheme();

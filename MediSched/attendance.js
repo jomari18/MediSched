@@ -1,4 +1,43 @@
-export const ATTENDANCE_LABELS={scheduled:'Scheduled',checked_in:'Checked in',in_consultation:'In consultation',completed:'Completed',no_show:'No show',cancelled:'Cancelled',not_recorded:'Attendance not recorded'};
-export function attendanceLabel(appointment,attendance){if(appointment.status==='cancelled')return 'Cancelled';return ATTENDANCE_LABELS[attendance?.state||appointment.attendance_state]||'Attendance not recorded';}
-export function formatVisitRange(a){const start=new Date(a.start_at),end=new Date(a.end_at);if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime()))return 'Time needs review';const date=new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',month:'short',day:'numeric',year:'numeric'});const time=new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',hour:'numeric',minute:'2-digit',hour12:true});return `${date.format(start)} · ${time.format(start)}–${time.format(end)} · Philippine time`;}
-export function manilaToday(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+export const ATTENDANCE_LABELS = {
+  scheduled: 'Scheduled',
+  checked_in: 'Checked in',
+  in_consultation: 'In consultation',
+  completed: 'Completed',
+  no_show: 'No show',
+  cancelled: 'Cancelled',
+  not_recorded: 'Attendance not recorded'
+};
+export function attendanceLabel(appointment, attendance) {
+  if (appointment.status === 'cancelled') return 'Cancelled';
+  return (
+    ATTENDANCE_LABELS[attendance?.state || appointment.attendance_state] ||
+    'Attendance not recorded'
+  );
+}
+export function formatVisitRange(a) {
+  const start = new Date(a.start_at),
+    end = new Date(a.end_at);
+  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()))
+    return 'Time needs review';
+  const date = new Intl.DateTimeFormat('en-PH', {
+    timeZone: 'Asia/Manila',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+  const time = new Intl.DateTimeFormat('en-PH', {
+    timeZone: 'Asia/Manila',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+  return `${date.format(start)} · ${time.format(start)}–${time.format(end)} · Philippine time`;
+}
+export function manilaToday() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Manila',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
+}

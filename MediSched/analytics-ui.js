@@ -1,25 +1,290 @@
-import {createAnalyticsData,analyticsRange,metricNumber} from './analytics.js';
-import {manilaToday} from './attendance.js';
-import {element} from './workspace.js';
-export function createAnalyticsView({getAuth,onForbidden}){
- const section=element('section',null,'analytics-view');section.id='analyticsPanel';section.hidden=true;const title=element('h2','Clinic analytics');title.tabIndex=-1;const filters=element('form',null,'analytics-filters card');
- const field=(text,id,type)=>{const box=element('div'),label=element('label',text);label.htmlFor=id;const control=element('input');control.type=type;control.id=id;control.required=true;box.append(label,control);filters.append(box);return control};
- const from=field('From (Philippine date)','analyticsFrom','date'),to=field('Through','analyticsTo','date');const doctorBox=element('div'),doctorLabel=element('label','Doctor'),doctor=element('select');doctorLabel.htmlFor='analyticsDoctor';doctor.id='analyticsDoctor';doctorBox.append(doctorLabel,doctor);filters.append(doctorBox);const apply=element('button','Update analytics');apply.type='submit';filters.append(apply);
- const presets=element('div',null,'row-actions');for(const [days,label] of [[1,'Today'],[7,'Last 7 days'],[30,'Last 30 days']]){const b=element('button',label,'secondary');b.onclick=()=>{preset(days);load()};presets.append(b)}
- const status=element('p',null,'feature-status');status.setAttribute('role','status');const output=element('div',null,'analytics-output');section.append(title,element('p','Visit-date totals · Asia/Manila. Historical attendance may be incomplete.','muted'),filters,presets,status,output);document.querySelector('#staffContent main .footer').before(section);
- let epoch=0;
- function preset(days){const r=analyticsRange(manilaToday(),days);from.value=r.from;to.value=r.to;from.max=to.max=manilaToday()}
- preset(7);
- function table(title,headers,rows){const card=element('section',null,'card analytics-table');card.append(element('h3',title));const wrap=element('div',null,'table-scroll'),table=element('table'),head=element('thead'),tr=element('tr');for(const h of headers){const th=element('th',h);th.scope='col';tr.append(th)}head.append(tr);table.append(head);const body=element('tbody');for(const row of rows){const tr=element('tr');for(const v of row)tr.append(element('td',String(v)));body.append(tr)}table.append(body);if(rows.length)wrap.append(table);else wrap.append(element('p','No visits in this range.','empty-state'));card.append(wrap);return card}
- function bars(title,rows,key,label){const card=element('section',null,'card analytics-chart');card.append(element('h3',title));const max=Math.max(1,...rows.map(r=>Number(r[key])||0));for(const r of rows){const item=element('div',null,'analytics-bar-row');item.append(element('span',String(r[label]),'small'),element('strong',metricNumber(r[key])));const rail=element('div',null,'analytics-bar-rail'),bar=element('div',null,'analytics-bar');bar.style.width=Math.max(0,Math.min(100,100*(Number(r[key])||0)/max))+'%';rail.append(bar);item.append(rail);card.append(item)}if(!rows.length)card.append(element('p','No recorded visits.','empty-state'));return card}
- function render(data,appliedDoctor){output.replaceChildren();const snapshot=new Date(data.generated_at);output.append(element('p','Applied: '+data.from+' – '+data.to+' · '+appliedDoctor+' · Server snapshot: '+(Number.isFinite(snapshot.getTime())?new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',dateStyle:'medium',timeStyle:'short'}).format(snapshot):'unavailable'),'small'));const s=data.summary,cards=element('div',null,'metrics');for(const [value,label,note] of [[s.total,'Appointments','All saved visits'],[s.cancelled,'Cancellations','By visit date'],[s.no_show_rate,'Recorded no-show rate',`${s.no_show_count}/${s.no_show_denominator} resolved ended visits; ${s.ended_visits} ended visits total`],[s.average_wait_minutes,'Average wait',`${s.wait_samples}/${s.checked_in_samples} check-ins have a consultation start`]]){const c=element('article',null,'metric card');c.append(element('p',label,'small'),element('strong',metricNumber(value)+(value!==null&&['Average wait','Recorded no-show rate'].includes(label)?label==='Average wait'?' min':'%':'')),element('p',note,'small'));cards.append(c)}output.append(cards);
- const charts=element('div',null,'analytics-grid');charts.append(bars('Daily appointments',data.daily,'total','day'),bars('Department activity',data.departments,'total','name'));output.append(charts);
- output.append(table('Doctor utilization',['Doctor','Booked minutes','Capacity minutes','Utilization'],data.doctors.map(d=>[d.name,metricNumber(d.booked_minutes),metricNumber(d.capacity_minutes),metricNumber(d.utilization_percent)+(d.utilization_percent===null?'':'%')])),element('p','Utilization is non-cancelled booked time inside clinic windows, divided by current clinic-hours capacity. It is not time actually worked or a historical doctor shift schedule.','small'),table('Daily visit counts',['Visit date','Total','Active','Cancelled'],data.daily.map(d=>[d.day,d.total,d.active,d.cancelled])),table('Departments',['Department','Total','Active','Cancelled'],data.departments.map(d=>[d.name,d.total,d.active,d.cancelled])));
- }
- async function load(){const state=getAuth();if(!state?.access.is_staff)return;const request=++epoch;output.replaceChildren();if(!from.value||!to.value||!filters.checkValidity()||to.value>manilaToday()||from.value>to.value||(Date.parse(to.value)-Date.parse(from.value))/86400000>92){status.textContent='Choose up to 93 inclusive days through today.';return}apply.disabled=true;status.textContent='Loading clinic analytics…';const chosen=doctor.value,appliedDoctor=doctor.selectedOptions[0]?.textContent||'All doctors';doctor.replaceChildren(...[...document.getElementById('staffDoctor').options].map(o=>new Option(o.text,o.value)));doctor.value=chosen;
-  try{const data=await createAnalyticsData(state.client).load({from:from.value,to:to.value,doctorId:chosen});if(request!==epoch||getAuth()!==state||section.hidden)return;render(data,appliedDoctor);status.textContent='Updated. Cancellations use visit dates; no-shows count recorded outcomes only.'}catch(e){if(request!==epoch||getAuth()!==state)return;if(e.code==='42501'){onForbidden(e);return}status.textContent=['PGRST202','42883'].includes(e.code)?'Analytics awaits administrator setup (migration 008). Existing appointments remain available.':'Analytics could not be loaded. Refresh your connection and try again.'}finally{if(request===epoch)apply.disabled=false}}
- for(const control of [from,to,doctor])control.addEventListener('input',()=>{++epoch;output.replaceChildren();apply.disabled=false;status.textContent='Filters changed. Update analytics to load this range.'});
- filters.onsubmit=e=>{e.preventDefault();load()};
- return {open(){section.hidden=false;title.focus();load()},hide(){++epoch;section.hidden=true;output.replaceChildren();apply.disabled=false;status.textContent=''},load,clear(){++epoch;section.hidden=true;output.replaceChildren();status.textContent='';doctor.replaceChildren();preset(7);apply.disabled=false}};
+import { createAnalyticsData, analyticsRange, metricNumber } from './analytics.js';
+import { manilaToday } from './attendance.js';
+import { element } from './workspace.js';
+export function createAnalyticsView({ getAuth, onForbidden }) {
+  const section = element('section', null, 'analytics-view');
+  section.id = 'analyticsPanel';
+  section.hidden = true;
+  const title = element('h2', 'Clinic analytics');
+  title.tabIndex = -1;
+  const filters = element('form', null, 'analytics-filters card');
+  const field = (text, id, type) => {
+    const box = element('div'),
+      label = element('label', text);
+    label.htmlFor = id;
+    const control = element('input');
+    control.type = type;
+    control.id = id;
+    control.required = true;
+    box.append(label, control);
+    filters.append(box);
+    return control;
+  };
+  const from = field('From (Philippine date)', 'analyticsFrom', 'date'),
+    to = field('Through', 'analyticsTo', 'date');
+  const doctorBox = element('div'),
+    doctorLabel = element('label', 'Doctor'),
+    doctor = element('select');
+  doctorLabel.htmlFor = 'analyticsDoctor';
+  doctor.id = 'analyticsDoctor';
+  doctorBox.append(doctorLabel, doctor);
+  filters.append(doctorBox);
+  const apply = element('button', 'Update analytics');
+  apply.type = 'submit';
+  filters.append(apply);
+  const presets = element('div', null, 'row-actions');
+  for (const [days, label] of [
+    [1, 'Today'],
+    [7, 'Last 7 days'],
+    [30, 'Last 30 days']
+  ]) {
+    const b = element('button', label, 'secondary');
+    b.onclick = () => {
+      preset(days);
+      load();
+    };
+    presets.append(b);
+  }
+  const status = element('p', null, 'feature-status');
+  status.setAttribute('role', 'status');
+  const output = element('div', null, 'analytics-output');
+  section.append(
+    title,
+    element(
+      'p',
+      'Visit-date totals · Asia/Manila. Historical attendance may be incomplete.',
+      'muted'
+    ),
+    filters,
+    presets,
+    status,
+    output
+  );
+  document.querySelector('#staffContent main .footer').before(section);
+  let epoch = 0;
+  function preset(days) {
+    const r = analyticsRange(manilaToday(), days);
+    from.value = r.from;
+    to.value = r.to;
+    from.max = to.max = manilaToday();
+  }
+  preset(7);
+  function table(title, headers, rows) {
+    const card = element('section', null, 'card analytics-table');
+    card.append(element('h3', title));
+    const wrap = element('div', null, 'table-scroll'),
+      table = element('table'),
+      head = element('thead'),
+      tr = element('tr');
+    for (const h of headers) {
+      const th = element('th', h);
+      th.scope = 'col';
+      tr.append(th);
+    }
+    head.append(tr);
+    table.append(head);
+    const body = element('tbody');
+    for (const row of rows) {
+      const tr = element('tr');
+      for (const v of row) tr.append(element('td', String(v)));
+      body.append(tr);
+    }
+    table.append(body);
+    if (rows.length) wrap.append(table);
+    else wrap.append(element('p', 'No visits in this range.', 'empty-state'));
+    card.append(wrap);
+    return card;
+  }
+  function bars(title, rows, key, label) {
+    const card = element('section', null, 'card analytics-chart');
+    card.append(element('h3', title));
+    const max = Math.max(1, ...rows.map(r => Number(r[key]) || 0));
+    for (const r of rows) {
+      const item = element('div', null, 'analytics-bar-row');
+      item.append(
+        element('span', String(r[label]), 'small'),
+        element('strong', metricNumber(r[key]))
+      );
+      const rail = element('div', null, 'analytics-bar-rail'),
+        bar = element('div', null, 'analytics-bar');
+      bar.style.width = Math.max(0, Math.min(100, (100 * (Number(r[key]) || 0)) / max)) + '%';
+      rail.append(bar);
+      item.append(rail);
+      card.append(item);
+    }
+    if (!rows.length) card.append(element('p', 'No recorded visits.', 'empty-state'));
+    return card;
+  }
+  function render(data, appliedDoctor) {
+    output.replaceChildren();
+    const snapshot = new Date(data.generated_at);
+    output.append(
+      element(
+        'p',
+        'Applied: ' +
+          data.from +
+          ' – ' +
+          data.to +
+          ' · ' +
+          appliedDoctor +
+          ' · Server snapshot: ' +
+          (Number.isFinite(snapshot.getTime())
+            ? new Intl.DateTimeFormat('en-PH', {
+                timeZone: 'Asia/Manila',
+                dateStyle: 'medium',
+                timeStyle: 'short'
+              }).format(snapshot)
+            : 'unavailable'),
+        'small'
+      )
+    );
+    const s = data.summary,
+      cards = element('div', null, 'metrics');
+    for (const [value, label, note] of [
+      [s.total, 'Appointments', 'All saved visits'],
+      [s.cancelled, 'Cancellations', 'By visit date'],
+      [
+        s.no_show_rate,
+        'Recorded no-show rate',
+        `${s.no_show_count}/${s.no_show_denominator} resolved ended visits; ${s.ended_visits} ended visits total`
+      ],
+      [
+        s.average_wait_minutes,
+        'Average wait',
+        `${s.wait_samples}/${s.checked_in_samples} check-ins have a consultation start`
+      ]
+    ]) {
+      const c = element('article', null, 'metric card');
+      c.append(
+        element('p', label, 'small'),
+        element(
+          'strong',
+          metricNumber(value) +
+            (value !== null && ['Average wait', 'Recorded no-show rate'].includes(label)
+              ? label === 'Average wait'
+                ? ' min'
+                : '%'
+              : '')
+        ),
+        element('p', note, 'small')
+      );
+      cards.append(c);
+    }
+    output.append(cards);
+    const charts = element('div', null, 'analytics-grid');
+    charts.append(
+      bars('Daily appointments', data.daily, 'total', 'day'),
+      bars('Department activity', data.departments, 'total', 'name')
+    );
+    output.append(charts);
+    output.append(
+      table(
+        'Doctor utilization',
+        ['Doctor', 'Booked minutes', 'Capacity minutes', 'Utilization'],
+        data.doctors.map(d => [
+          d.name,
+          metricNumber(d.booked_minutes),
+          metricNumber(d.capacity_minutes),
+          metricNumber(d.utilization_percent) + (d.utilization_percent === null ? '' : '%')
+        ])
+      ),
+      element(
+        'p',
+        'Utilization is non-cancelled booked time inside clinic windows, divided by current clinic-hours capacity. It is not time actually worked or a historical doctor shift schedule.',
+        'small'
+      ),
+      table(
+        'Daily visit counts',
+        ['Visit date', 'Total', 'Active', 'Cancelled'],
+        data.daily.map(d => [d.day, d.total, d.active, d.cancelled])
+      ),
+      table(
+        'Departments',
+        ['Department', 'Total', 'Active', 'Cancelled'],
+        data.departments.map(d => [d.name, d.total, d.active, d.cancelled])
+      )
+    );
+  }
+  async function load() {
+    const state = getAuth();
+    if (!state?.access.is_staff) return;
+    const request = ++epoch;
+    output.replaceChildren();
+    if (
+      !from.value ||
+      !to.value ||
+      !filters.checkValidity() ||
+      to.value > manilaToday() ||
+      from.value > to.value ||
+      (Date.parse(to.value) - Date.parse(from.value)) / 86400000 > 92
+    ) {
+      status.textContent = 'Choose up to 93 inclusive days through today.';
+      return;
+    }
+    apply.disabled = true;
+    status.textContent = 'Loading clinic analytics…';
+    const chosen = doctor.value,
+      appliedDoctor = doctor.selectedOptions[0]?.textContent || 'All doctors';
+    doctor.replaceChildren(
+      ...[...document.getElementById('staffDoctor').options].map(o => new Option(o.text, o.value))
+    );
+    doctor.value = chosen;
+    try {
+      const data = await createAnalyticsData(state.client).load({
+        from: from.value,
+        to: to.value,
+        doctorId: chosen
+      });
+      if (request !== epoch || getAuth() !== state || section.hidden) return;
+      render(data, appliedDoctor);
+      status.textContent =
+        'Updated. Cancellations use visit dates; no-shows count recorded outcomes only.';
+    } catch (e) {
+      if (request !== epoch || getAuth() !== state) return;
+      if (e.code === '42501') {
+        onForbidden(e);
+        return;
+      }
+      status.textContent = ['PGRST202', '42883'].includes(e.code)
+        ? 'Analytics awaits administrator setup (migration 008). Existing appointments remain available.'
+        : 'Analytics could not be loaded. Refresh your connection and try again.';
+    } finally {
+      if (request === epoch) apply.disabled = false;
+    }
+  }
+  for (const control of [from, to, doctor])
+    control.addEventListener('input', () => {
+      ++epoch;
+      output.replaceChildren();
+      apply.disabled = false;
+      status.textContent = 'Filters changed. Update analytics to load this range.';
+    });
+  filters.onsubmit = e => {
+    e.preventDefault();
+    load();
+  };
+  return {
+    open() {
+      section.hidden = false;
+      title.focus();
+      load();
+    },
+    hide() {
+      ++epoch;
+      section.hidden = true;
+      output.replaceChildren();
+      apply.disabled = false;
+      status.textContent = '';
+    },
+    load,
+    clear() {
+      ++epoch;
+      section.hidden = true;
+      output.replaceChildren();
+      status.textContent = '';
+      doctor.replaceChildren();
+      preset(7);
+      apply.disabled = false;
+    }
+  };
 }
-
