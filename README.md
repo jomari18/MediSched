@@ -13,6 +13,22 @@ Clinic appointment scheduling system developed by **Jomari M. Candido**. Built w
 
 Appointments last one hour, starting at 15-minute intervals. The clinic schedule is every day, 8 AM–5 PM, with lunch from 12 PM–1 PM. All schedules use Philippine time.
 
+## System design
+
+These diagrams were drawn from the app's actual database schema, roles and code paths.
+
+**Context diagram.** MediSched as a single process, and the people and outside services it exchanges data with.
+
+![MediSched context diagram](docs/diagrams/context-diagram.png)
+
+**Data flow diagram (Level 1).** The main processes, the data stores they read and write (grouped from the database tables), and the data that moves between them.
+
+![MediSched data flow diagram](docs/diagrams/data-flow-diagram.png)
+
+**Flowchart: booking and QR check-in.** The main workflow step by step, including decisions and error paths.
+
+![MediSched flowchart](docs/diagrams/flowchart.png)
+
 ## Run locally
 
 ```sh
