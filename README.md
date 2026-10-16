@@ -1,17 +1,22 @@
 # MediSched
 
-[Live application](https://mymedisched.netlify.app/)
+**Clinic Appointment Scheduling System**
 
-Clinic appointment scheduling system developed by **Jomari M. Candido**. Built with vanilla HTML, CSS and JavaScript, Supabase Auth/PostgreSQL, Supabase Edge Functions, Brevo email and Netlify.
+MediSched lets patients book, track, and cancel clinic appointments online, and gives clinic staff a daily schedule with QR check-in, consultation progress, and analytics. Appointments last one hour, start at 15-minute intervals, and follow clinic hours: every day, 8 AM–5 PM, with lunch from 12 PM–1 PM, in Philippine time.
+
+## Live Demo
+
+**[Open MediSched](https://mymedisched.netlify.app/)**
+
+## Highlights
 
 - Patient registration with email verification and OTP resend
-- Available appointment slots, booking, history and cancellation
-- Database-enforced overlap prevention and clinic hours
-- Expiring opaque QR passes with staff camera/manual check-in
-- Staff schedule, consultation progress and clinic analytics
-- Responsive phone layouts, light/dark themes and medical illustrations
-
-Appointments last one hour, starting at 15-minute intervals. The clinic schedule is every day, 8 AM–5 PM, with lunch from 12 PM–1 PM. All schedules use Philippine time.
+- Live available slots, booking, appointment history, and cancellation
+- Double bookings prevented by a PostgreSQL exclusion constraint and idempotent request IDs
+- Booking confirmation emails sent from a Supabase Edge Function through Brevo
+- Expiring QR check-in passes with staff camera or manual check-in
+- Private staff workspace with daily schedule, consultation progress, activity log, and clinic analytics
+- Responsive phone layouts with bottom navigation, light/dark themes, and medical illustrations
 
 ## System design
 
@@ -29,7 +34,25 @@ These diagrams were drawn from the app's actual database schema, roles and code 
 
 ![MediSched flowchart](docs/diagrams/flowchart.png)
 
-## Run locally
+## Tech Stack
+
+- HTML5, CSS3, JavaScript
+- Supabase Auth, PostgreSQL (with `btree_gist`), Row Level Security, and RPC functions
+- Supabase Edge Functions
+- Brevo SMTP for sign-up codes and Brevo API for appointment emails
+- Netlify
+
+## Security Design
+
+Patient records are owner-only through Row Level Security. Staff access comes from a private staff-membership table checked in the database, not from editable user metadata. Booking, cancellation, check-in, and attendance changes run through transactional RPC functions, and QR check-in passes are opaque, single-use, and expire.
+
+> Only the Supabase project URL and publishable key are in `config.js`. The Brevo API key and other server credentials are stored as Supabase Edge Function secrets and must never be committed to this repository.
+
+## Database
+
+SQL migrations are in [`MediSched/supabase/migrations/`](MediSched/supabase/migrations/) and apply in filename order to a fresh project. Do not replay migrations against an already-configured production database. Setup guides: [production setup](MediSched/PRODUCTION_SETUP.md), [email](MediSched/EMAIL_SETUP.md), [available slots](MediSched/AVAILABLE_SLOTS.md), [staff access](MediSched/STAFF_SETUP.md), and [QR check-in and analytics](MediSched/docs/qr-analytics-setup.md).
+
+## Local Use
 
 ```sh
 cd MediSched
@@ -37,19 +60,17 @@ npm ci
 npm run serve
 ```
 
-Open http://127.0.0.1:5173. Local configuration targets the separate staging backend. Only public browser credentials are committed; server-side credentials belong in Supabase secrets.
+Open http://127.0.0.1:5173. Local configuration targets a separate staging backend. `npm run build:production` creates `MediSched/dist` with the production configuration; Netlify builds this automatically from the `MediSched` base directory. More detail is in the [project README](MediSched/README.md).
 
-## Production build
+## Testing
 
-```sh
-cd MediSched
-npm run build:production
-```
+`npm test` (from `MediSched`) runs 59 unit tests. 51 database integration tests run against an isolated local PostgreSQL fixture, and browser audits use the Playwright CLI. Results and screenshots are in the [audit report](MediSched/AUDIT.md).
 
-Upload `MediSched/dist` to the existing Netlify site. For Git-connected Netlify builds, use base directory `MediSched`, build command `npm run build:production`, publish directory `dist`. Plain `npm run build` retains the local staging configuration.
+## Author
 
-## Verification and setup
+**Jomari M. Candido**
+Sole Software Developer
 
-Run `npm test` from `MediSched` for unit tests. Database integration tests require the isolated local PostgreSQL fixture; see [project README](MediSched/README.md). Browser audit scripts use the installed Playwright CLI.
+## Project Status
 
-See [audit report](MediSched/AUDIT.md), [production setup](MediSched/PRODUCTION_SETUP.md), and [QR/analytics setup](MediSched/docs/qr-analytics-setup.md). Do not replay SQL migrations against an already-configured production database.
+Portfolio release — live on Netlify and deployed from this repository.
