@@ -35,3 +35,6 @@ button[data-view=home]{--nav-icon:url('assets/medical-pack/icons/home.svg')}butt
 #scheduleBtn::before,#scanCheckin::before,#logout::before{content:"";display:inline-block;width:20px;height:20px;vertical-align:middle;margin-right:10px;background:currentColor;mask:var(--button-icon) center/contain no-repeat}#scheduleBtn{--button-icon:url('assets/medical-pack/icons/calendar-plus.svg')}#scanCheckin{--button-icon:url('assets/medical-pack/icons/qr-code.svg')}#logout{--button-icon:url('assets/medical-pack/icons/sign-out.svg')}
 @media(max-width:1100px){.how-it-works article{flex-wrap:wrap}.how-it-works article>div{flex-basis:100%}}
 @media(max-width:767px){#nextVisit::after{background-image:url('assets/medical-pack/illustrations/mobile-calendar.png');width:35%;height:68%;right:3%}.auth-illustration img{width:125px;height:130px}.how-it-works article{flex-wrap:nowrap}.how-it-works article>div{flex-basis:auto}.feature-art{width:54px;height:54px}.how-it-works article>span{width:28px;height:28px}.booking-summary img{display:none}#logout::before{display:none}.verification-art{width:95px;height:95px}}
+
+/* 320 px phones: the auth illustration shares its row with the brand, so it may shrink instead of overflowing. */
+@media(max-width:767px){.auth-illustration img{max-width:50%}}
