@@ -60,7 +60,8 @@ export function createAnalyticsView({ getAuth, onForbidden }) {
     status,
     output
   );
-  document.querySelector('#staffContent main .footer').before(section);
+  // At the end of the workspace's main column (the page no longer has a footer to anchor to).
+  document.querySelector('#staffContent main').append(section);
   let epoch = 0;
   function preset(days) {
     const r = analyticsRange(manilaToday(), days);
