@@ -11,7 +11,7 @@ export function renderPatientOverview({
   const c = document.getElementById('nextVisit');
   c.replaceChildren();
   const next = appointments
-    .filter(a => a.status !== 'cancelled' && Date.parse(a.start_at) > Date.now())
+    .filter(a => appointmentStatus(a, Date.now(), attendance.get(a.id)?.state || a.attendance_state) === 'upcoming')
     .sort((a, b) => Date.parse(a.start_at) - Date.parse(b.start_at))[0];
   c.append(element('p', 'YOUR NEXT APPOINTMENT', 'eyebrow'));
   if (!next) {
@@ -74,7 +74,9 @@ export function renderPatientAppointments({
 }) {
   const container = document.getElementById('appointmentCards');
   container.replaceChildren();
-  const visible = appointments.filter(a => appointmentStatus(a) === filter);
+  const visible = appointments.filter(
+    a => appointmentStatus(a, Date.now(), attendance.get(a.id)?.state || a.attendance_state) === filter
+  );
   if (!visible.length) container.append(element('p', `No ${filter} appointments.`));
   if (visible.length) {
     const header = element('div', null, 'appointment-table-head');

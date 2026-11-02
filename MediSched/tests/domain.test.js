@@ -11,3 +11,10 @@ test('status uses cancellation precedence and exact start boundary',()=>{assert.
 test('saved appointment displays minutes and midnight in Manila time',()=>{assert.deepEqual(manilaDateTime('2030-10-08T01:45:00Z'),{date:'2030-10-08',time:'09:45'});assert.deepEqual(manilaDateTime('2030-10-08T16:00:00Z'),{date:'2030-10-09',time:'00:00'});});
 test('age rejects whitespace and coerced objects',()=>{for(const patientAge of [' ',[],{},true,null])assert.throws(()=>validateAppointment({...input,patientAge},now));});
 test('RPC parameters contain stable choices and no client owner/email',()=>{const p=bookingParameters('request-id',validateAppointment(input,now));assert.equal(p.p_doctor_id,'dr-smith');assert.equal(p.p_start_at,'2030-10-08T01:45:00.000Z');assert.equal(Object.hasOwn(p,'owner_uid'),false);assert.equal(Object.hasOwn(p,'email'),false);assert.equal(DOCTORS.length,9);assert.equal(TYPES.length,10);});
+
+test('a finished visit counts as past even before its start time',()=>{
+  const later={status:'active',start_at:new Date(now+3600000).toISOString()};
+  for(const state of ['completed','no_show'])assert.equal(appointmentStatus(later,now,state),'past',state);
+  for(const state of ['scheduled','checked_in','in_consultation',undefined])assert.equal(appointmentStatus(later,now,state),'upcoming');
+  assert.equal(appointmentStatus({...later,status:'cancelled'},now,'completed'),'cancelled');
+});

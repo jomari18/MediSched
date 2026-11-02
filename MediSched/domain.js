@@ -73,8 +73,10 @@ export function validateAppointment(
 export function overlaps(a, b) {
   return a.startMs < b.endMs && b.startMs < a.endMs;
 }
-export function appointmentStatus(a, now = Date.now()) {
+export function appointmentStatus(a, now = Date.now(), attendanceState = a.attendance_state) {
   if (a.status === 'cancelled') return 'cancelled';
+  // A finished visit is history even if its booked time has not come yet.
+  if (attendanceState === 'completed' || attendanceState === 'no_show') return 'past';
   const start = Date.parse(a.start_at);
   return Number.isFinite(start) ? (start > now ? 'upcoming' : 'past') : 'needs-review';
 }
